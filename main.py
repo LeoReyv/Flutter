@@ -7,8 +7,6 @@ from flet import (
     IconButton,
     OutlinedButton,
     Page,
-    Ref,
-    row,
     Container,
     Card,
     InputBorder,
@@ -57,8 +55,13 @@ class Task(UserControl):
      
 
     def build(self):
+<<<<<<< HEAD
         self.display_task=TextField(label="producto -",label_style=TextStyle(size=20,color=colors.BLACK) ,border=flet.InputBorder.UNDERLINE, disabled=True,expand=True, value=self.task_producto,text_size=32,text_style=TextStyle(color=colors.BLACK,size=25))
         self.precio = Text(self.precio,size=32)
+=======
+        self.display_task=TextField(label="producto -", disabled=True,expand=True, value=self.task_producto,text_size=20,text_style=TextStyle(color=colors.BLACK,size=25))
+        self.precio = Text(self.precio)
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
         self.display_view= Row(
             
             controls=[
@@ -70,7 +73,11 @@ class Task(UserControl):
                         visible =False,
                         icon = icons.ARROW_LEFT
                         ),
+<<<<<<< HEAD
                         Text(self.task_cantidad,color="black",size=28),
+=======
+                        Text(self.task_cantidad,color="black",size=15),
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
                         IconButton(
                         visible = False,
                         icon=icons.ARROW_RIGHT
@@ -143,6 +150,17 @@ class Registro(UserControl):
             expand=True,
                             vertical_alignment=MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
+<<<<<<< HEAD
+=======
+                
+                        Row(
+                            controls=[
+                            self.new_task,
+                            ElevatedButton(text="Submit", ),
+                             ElevatedButton(text="c2", ),
+                        
+                            ],
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
 
                             Column(
                                 expand=True,
@@ -196,7 +214,11 @@ class TodoApp(UserControl):
             on_submit=self.button_clicked,
             expand = True)
         self.tasks = Column()
+<<<<<<< HEAD
         self.task_total=Text(f"Total = {self.total}",size=32)
+=======
+        self.task_total=Text(f"Total = {self.total}",)
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
         self.filter=Tabs(
             selected_index=0,
             on_change=self.tabs_changed,
@@ -205,8 +227,13 @@ class TodoApp(UserControl):
         
         
         return Column(
+<<<<<<< HEAD
             expand=True,
                    
+=======
+                    width=600,
+                    height=600,
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
                     controls=[
                 
                         Row(
@@ -227,6 +254,7 @@ class TodoApp(UserControl):
                                 ]
 
                         ),Row(
+<<<<<<< HEAD
                             
                             vertical_alignment="center",
                             alignment=MainAxisAlignment.END ,
@@ -237,6 +265,13 @@ class TodoApp(UserControl):
                                 
                                 
                                 
+=======
+                            vertical_alignment="right",
+                            
+                            controls=[
+                                
+                                self.task_total,
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
                                 
                              ],
                                 ),
@@ -296,15 +331,19 @@ class TodoApp(UserControl):
 
 class Con(UserControl):
     def build(self):
+<<<<<<< HEAD
 
         
         
+=======
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
         self.c1 = Container(
             
 
             
             content= TodoApp(),
             
+<<<<<<< HEAD
             border_radius=20,
             margin=10,
             padding=flet.padding.symmetric(horizontal=10,vertical=50),
@@ -323,6 +362,17 @@ class Con(UserControl):
             
             bgcolor=flet.colors.LIGHT_BLUE_100,
             
+=======
+            bgcolor=colors.WHITE,
+            padding=55,
+        )
+
+        self.c2 =Container(
+            content=Otra(),
+            visible=False,
+            bgcolor=colors.WHITE,
+            padding=5,
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
         )
 
         self.c3 = Container(
@@ -332,6 +382,7 @@ class Con(UserControl):
             padding=5,
         )
 
+<<<<<<< HEAD
         return Column(  expand=True,          
                 
                     alignment=MainAxisAlignment.SPACE_AROUND,
@@ -363,14 +414,29 @@ class Con(UserControl):
         self.update()
     
     
+=======
+        return Column(spacing=25,controls=[
+            self.c1,self.c2, ElevatedButton(text="Submit2", on_click=self.button_clicked),])
+    def button_clicked(self,e):
+        self.c1.visible=False
+        self.c2.visible=True
+        self.update()
+        
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
   
 def main(page: Page):
     page.horizontal_alignment = "center"
     page.scroll = "adaptive"
+<<<<<<< HEAD
     page.window_max_height=800
     page.window_max_width=1200
     page.window_min_height=600
     page.window_min_width=800    
+=======
+    page.window_max_height=500
+    page.window_max_width=800
+    
+>>>>>>> 249cec487d0ffceec9e66dd845a4b176ede02117
     page.update()
    
     # create application instance
