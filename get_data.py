@@ -26,12 +26,14 @@ def get_database():
 
 def get_collection():
    try:
+      dbname = get_database()
       return(dbname["productos"] )
    except Exception as e:
       return(False)
 
 def get_precios():
    try:
+      dbname = get_database()
       return(dbname["registros"])
    except Exception as es:
       return(False)
