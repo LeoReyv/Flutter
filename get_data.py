@@ -1,8 +1,11 @@
 from pymongo import MongoClient
 
 from dateutil import parser
-#expiry_date = '2021-07-13T00:00:00.000Z'
-#expiry = parser.parse(expiry_date)
+
+import datetime
+from dateutil import parser
+
+fecha_registro = datetime.datetime.now()
 
 
 from datetime import datetime
@@ -22,16 +25,20 @@ def get_database():
    return client['pythonDB']
 
 def get_collection():
-   dbname= get_database()
-   return(dbname["productos"] )
+   try:
+      return(dbname["productos"] )
+   except Exception as e:
+      return(False)
 
-
-
-
+def get_precios():
+   try:
+      return(dbname["registros"])
+   except Exception as es:
+      return(False)
 def get_cliente(cliente:str):
    dic_con =[]
         
-   #collection_name=dbname["productos"]
+   #
 
    collection_name= get_collection()
    for n in collection_name.find({"cliente":str(cliente)}):
@@ -41,7 +48,31 @@ def get_cliente(cliente:str):
 
    return(dic_con)
 
+def registro_producto(nombre:str, precio:int|float):
+    
+    try:
+        dbname = get_database()
+        collection_name = dbname["registros"]
 
+        print(fecha_registro)
+        print("Conexion")
+        registro = {
+            "registro":{
+            "fecha":fecha_registro,
+            "producto" : {
+            "nombre": nombre,
+            "precio": precio,
+                
+                    }
+                }
+            }   
+
+        collection_name.insert_one(registro)
+        return True
+    except Exception as e:
+        print("Ocurrio una excepcion::",e)
+        return False
+    
 
   
 # This is added so that many files can reuse the function get_database()
