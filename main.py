@@ -45,7 +45,15 @@ class Compra(UserControl):
         self.task_new_compra = task_new_compra
 
     def build(self):
-        self.display_compra=TextField(label="producto -",label_style=TextStyle(size=20,color=colors.BLACK) ,border=flet.InputBorder.UNDERLINE, disabled=True,expand=True, value=self.task_new_compra,text_size=32,text_style=TextStyle(color=colors.BLACK,size=25))
+        self.display_compra=TextField(
+                                    label="producto -",
+                                    label_style=TextStyle(size=20,
+                                    color="black") ,
+                                    border=flet.InputBorder.UNDERLINE, 
+                                    disabled=True,expand=True, 
+                                    value=self.task_new_compra,
+                                    text_size=32,
+                                    text_style=TextStyle(color="black",size=25))
 
 class Task(UserControl):
     def __init__(self, task_producto,task_cantidad, task_precio):
@@ -57,27 +65,41 @@ class Task(UserControl):
      
 
     def build(self):
-        self.display_task=TextField(label="producto -",label_style=TextStyle(size=20,color=colors.BLACK) ,border=flet.InputBorder.UNDERLINE, disabled=True,expand=True, value=self.task_producto,text_size=32,text_style=TextStyle(color=colors.BLACK,size=25))
-        self.precio = Text(self.precio,size=32)
+        self.display_task=TextField(label="producto -",
+                                    label_style=TextStyle(size=25,color="black") ,
+                                    border=flet.InputBorder.UNDERLINE, disabled=True,expand=True, 
+                                    value=self.task_producto,text_size=32,color="black",
+                                    text_style=TextStyle(color="black",size=25))
+        self.precio = Text(
+                        self.precio,size=32,
+                        color="black")
         self.display_view= Row(
             
             controls=[
                  self.display_task,
                  Row(
+            
                     spacing=10,
                     controls=[
                         IconButton(
-                        visible =False,
-                        icon = icons.ARROW_LEFT
+                            visible =False,
+                            icon = icons.ARROW_LEFT
                         ),
-                        Text(self.task_cantidad,color="black",size=28),
+                        Text(
+                            self.task_cantidad,color="black",size=25
+                            ),
                         IconButton(
-                        visible = False,
-                        icon=icons.ARROW_RIGHT
+                            visible = False,
+                            icon=icons.ARROW_RIGHT,
+                            icon_color="black",
+                            icon_size=30,
                         ),
                         IconButton(
-                        icon = icons.ATTACH_MONEY
+                            icon = icons.ATTACH_MONEY,
+                            icon_color="black",
+                            icon_size=30,
                         ),
+                        
                         self.precio
                         ,
 
@@ -92,13 +114,13 @@ class Task(UserControl):
 class Compra(UserControl):
     def build(self):
         self.new_compra=TextField(
-            hint_text="que desea llevar?",
+            hint_text="que desea llevar?",color="black"
             )
         self.compras=Column()
         self.total_articulos= Text("0")
         return Column(
             controls=[
-                Row([Text(value="Lista de articulos",style="headlineMedium")],alignment="center"),
+                Row([Text(value="Lista de articulos",style="headlineMedium")],alignment="center",color="black"),
                 Row([self.new_compra,FloatingActionButton(icon=icons.ADD,)]
                 ),
                 Column(spacing=20,
@@ -124,7 +146,8 @@ class Compra(UserControl):
             #                 self.compras.controls.append()
             print("encontraso")
 
-
+    
+        
 
 class Registro(UserControl):
       
@@ -133,8 +156,8 @@ class Registro(UserControl):
     def build(self):
         self.total=0
         
-        self.nombre_task= TextField(hint_text="Nomre del producto",expand=True)
-        self.precio_task= TextField(hint_text="Precio del producto", expand=True)
+        self.nombre_task= TextField(hint_text="Nomre del producto",hint_style=TextStyle(color="black"),label_style=TextStyle(color="black"),color="black",expand=True)
+        self.precio_task= TextField(hint_text="Precio del producto",hint_style=TextStyle(color="black"),color="black", expand=True)
         self.buton_task= ElevatedButton(text="Registrar",on_click=self.registro_click)
         self.tasks = Column()
         
@@ -193,15 +216,19 @@ class TodoApp(UserControl):
     def build(self):
         self.total=0
         self.new_task = TextField(
-            hint_text="busqueda",
+            hint_text="busqueda",hint_style=TextStyle(color="black"),
             on_submit=self.button_clicked,
+            color="black",
             expand = True)
         self.tasks = Column()
-        self.task_total=Text(f"Total = {self.total}",size=32)
+        self.task_total=Text(f"Total = {self.total}",size=32,color="black")
         self.filter=Tabs(
             selected_index=0,
             on_change=self.tabs_changed,
-            tabs=[Tab(text="lista de compras"),Tab(text="Lista de clientes"),Tab(text="Lista de proveedores"),Tab(text="Productos")],
+            tabs=[Tab( tab_content=Text("lista de compras",color="black")),
+                  Tab( tab_content=Text("lista de compras",color="black")),
+                  Tab( tab_content=Text("lista de compras",color="black")),
+                  Tab( tab_content=Text("lista de compras",color="black"))],
             )
         
         
@@ -220,6 +247,7 @@ class TodoApp(UserControl):
                         ),
                     
                         Column(
+                                alignment="center",
                             spacing=25,
                             controls=[
                                 self.filter,
@@ -290,7 +318,7 @@ class TodoApp(UserControl):
 
     
     def update(self):
-        
+       
         self.task_total.value= f"Total = {self.total}"
         super().update()
 
@@ -310,7 +338,7 @@ class Con(UserControl):
             margin=10,
             padding=flet.padding.symmetric(horizontal=10,vertical=50),
             alignment= flet.alignment.center,
-            bgcolor=colors.AMBER,
+            bgcolor=flet.colors.BLUE_ACCENT_100
             
            
         )
@@ -327,10 +355,13 @@ class Con(UserControl):
         )
 
         self.c3 = Container(
-            content=OutlinedButton("Outlined Button in Container"),
+            content=Compra(),
             visible=False,
-            bgcolor=colors.WHITE,
-            padding=5,
+             border_radius=20,
+            margin=10,
+            padding=flet.padding.symmetric(horizontal=10,vertical=50),
+            
+            bgcolor=flet.colors.LIGHT_BLUE_100,
         )
 
         return Column(  expand=True,          
@@ -343,7 +374,7 @@ class Con(UserControl):
                                 
                                 vertical_alignment="center",
                                 controls=[  
-                                        ElevatedButton(text="Inicio",on_click=self.button_clicked),
+                                        ElevatedButton(text="Inicio",on_click=self.button_clicked_inicio),
                                         ElevatedButton(text="Buscar",on_click=self.button_clicked),
                                         ElevatedButton(text="Agregar",on_click=self.button_clicked2),
                                         ElevatedButton(text="Historial",on_click=self.button_clicked)
@@ -356,22 +387,33 @@ class Con(UserControl):
     def button_clicked2(self,e):
         self.c1.visible=False
         self.c2.visible=True
+        self.c3.visible=False
         self.update()
 
     def button_clicked(self,e):
         self.c1.visible=True
         self.c2.visible=False
+        self.c3.visible=False
         self.update()
     
-    
+    def button_clicked_inicio(self,e):
+        self.c1.visible=False
+        self.c2.visible=False
+        self.c3.visible=True
+        self.update()
+
+
   
 def main(page: Page):
+    page.expand=True
     page.horizontal_alignment = "center"
     page.scroll = "adaptive"
     page.window_max_height=800
     page.window_max_width=1200
     page.window_min_height=600
     page.window_min_width=800    
+    
+    page.window_bgcolor=flet.colors.BLUE_GREY_400
     page.update()
    
     # create application instance
