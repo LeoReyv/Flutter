@@ -19,21 +19,23 @@ def registro_producto(nombre, precio):
         print(fecha_registro)
         print("Conexion")
         registro = {
-            "registro":{
+            
             "fecha":fecha_registro,
-            "producto" : {
+            
             "nombre": nombre,
             "precio": precio,
                 
-                    }
+                    
                 }
-            }   
+   
 
         collection_name.insert_one(registro)
         return True
     except Exception as e:
         print("Ocurrio una excepcion::",e)
         return False
+
+        
     
 if __name__ == "__main__":   
   

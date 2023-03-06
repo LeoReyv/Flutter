@@ -34,19 +34,87 @@ from flet import (
 )
 
 
-from get_data import  get_collection,registro_producto,get_precios
+from get_data import  get_database
 
 
-collection_name = get_collection()
-collection_registro = get_precios()
-class Compra(UserControl):
-    def __init__(self, task_new_compra):
+dbase=get_database()
+
+class Compras(UserControl):
+    def __init__(self, task_producto, task_precio):
         super().__init__()
-        self.task_new_compra = task_new_compra
+        self.task_producto  = task_producto
+        
+        self.precio    = task_precio
+        
+      
 
     def build(self):
-        self.display_compra=TextField(label="producto -",label_style=TextStyle(size=20,color=colors.BLACK) ,border=flet.InputBorder.UNDERLINE, disabled=True,expand=True, value=self.task_new_compra,text_size=32,text_style=TextStyle(color=colors.BLACK,size=25))
+        self.display_task=TextField(label="producto -",
+        label_style=TextStyle(size=20,color=colors.BLACK) ,
+        border=flet.InputBorder.UNDERLINE, disabled=True,
+        expand=True, value=self.task_producto,text_size=32,
+        text_style=TextStyle(color=colors.BLACK,size=25))
+        self.cantidad  = 1
+        self.task_cantidad=Text(f"{self.cantidad}")
+        self.precio = Text(self.precio,size=32)
+        
+        self.display_items=Row(controls=[ IconButton(
+                        visible =True,
+                        icon = icons.ARROW_LEFT,
+                        on_click=self.quitar_producto,
+                        ),
+                        self.task_cantidad,
+                        IconButton(
+                        visible = True,
+                        icon=icons.ARROW_RIGHT,
+                        on_click=self.agregar_producto,
+                        ),
+                        IconButton(
+                        icon = icons.ATTACH_MONEY,disabled=True
+                        ), ])
+        self.display_view= Row(
+            
+            controls=[
+                 self.display_task,
+            ]
+                 
+            
+        )
+        return(Column (controls=[ self.display_view,self.display_items]))
+    def quitar_producto(self, e):
 
+        if self.cantidad>=1:
+            self.cantidad=self.cantidad-1
+        self.task_cantidad.value= f"{self.cantidad}"
+        self.update()
+
+
+    def agregar_producto(self, e):
+        self.cantidad=self.cantidad+1
+        self.task_cantidad.value= f"{self.cantidad}"
+        self.update()
+        
+    def update(self):
+        
+        self.task_cantidad.value= f"{self.cantidad}"
+ 
+
+   
+
+class NoTasK(UserControl):
+    def __init__(self, error):
+        super().__init__()
+        self.task_error = error
+
+    def build(self):
+        
+
+        self.display_view=Row(controls=[TextField(value=self.task_error,
+        expand=True, 
+         border=flet.InputBorder.UNDERLINE, disabled=True,
+         text_style=TextStyle(color=colors.BLACK,size=25)
+         )])
+        return(self.display_view)
 class Task(UserControl):
     def __init__(self, task_producto,task_cantidad, task_precio):
         super().__init__()
@@ -57,7 +125,12 @@ class Task(UserControl):
      
 
     def build(self):
-        self.display_task=TextField(label="producto -",label_style=TextStyle(size=20,color=colors.BLACK) ,border=flet.InputBorder.UNDERLINE, disabled=True,expand=True, value=self.task_producto,text_size=32,text_style=TextStyle(color=colors.BLACK,size=25))
+        self.display_task=TextField(label="producto -",
+        label_style=TextStyle(size=20,color=colors.BLACK) ,
+        border=flet.InputBorder.UNDERLINE, disabled=True,
+        expand=True, value=self.task_producto,text_size=32,
+        text_style=TextStyle(color=colors.BLACK,size=25))
+
         self.precio = Text(self.precio,size=32)
         self.display_view= Row(
             
@@ -90,42 +163,101 @@ class Task(UserControl):
 
 
 class Compra(UserControl):
+    
+    
+    
+
     def build(self):
-        self.new_compra=TextField(
-            hint_text="que desea llevar?",
-            )
-        self.compras=Column()
-        self.total_articulos= Text("0")
+        self.total=0
+        self.new_compra = TextField(
+            hint_text="producto",
+            on_submit=self.agregar_click,
+            expand = True)
+        self.compras = Column()
+        self.task_total=Text(f"Total = {self.total}",size=32)
+        
+        
+        
         return Column(
-            controls=[
-                Row([Text(value="Lista de articulos",style="headlineMedium")],alignment="center"),
-                Row([self.new_compra,FloatingActionButton(icon=icons.ADD,)]
-                ),
-                Column(spacing=20,
-                controls=[
-                    self.compras,
-                   Container(
-                    padding=flet.padding.symmetric(vertical=50),content=( Row(vertical_alignment=CrossAxisAlignment.END,
-                    
-                        controls=[self.total_articulos]))),
+            expand=True,
                    
-                ])
-            ]
-        )
+                    controls=[
+                
+                        Row(
+                            controls=[
+                            self.new_compra,
+                            FloatingActionButton(icon=icons.ADD, on_click=self.agregar_click),
+                           
+                            ],
+
+                        ),
+                    
+                        Column(
+                            spacing=25,
+                            controls=[
+                                
+                                self.compras,
+                                 
+                                ]
+
+                        ),Row(
+                            
+                            vertical_alignment="center",
+                            alignment=MainAxisAlignment.END ,
+                            
+                            controls=[Container(content=self.task_total,
+                            padding=flet.padding.symmetric(horizontal=20)),
+                                
+                                
+                                
+                                
+                                
+                             ],
+                                ),
+                                
+                        ]
+
+            
+                )
+    
+    def get_precios(self,producto):
+        try:
+            dbname=dbase
+            test=dbname["registros"]
+            dic=test.find({"nombre":producto})
+            for b in dic:
+                if b["nombre"]== producto:
+                    print("encontrado")
+                    prec=b["precio"]
+
+            print(prec)    
+            return(prec)
+            #precio=db
+            
+        except Exception as es:
+            return(False)
+
+  
 
     def agregar_click(self, e):
+    
         if self.new_compra.value:
-            # precio=collection_registro.find({"registro":self.new_task.value})
+            self.precio=self.get_precios(self.new_compra.value)
             # if precio!= False:
             #     for n in precio:
-            #         for m in n:
-            #             if m["nombre"]==self.new_compra.value:
-            #                 valor=m["precio"]
-            #                 self.compras.controls.append()
-            print("encontraso")
+            #         if n["nombre"]==self.new_compra.value:
+            #             self.precio=int(n["precio"])
+            self.total=self.total+float(self.precio)
+            task=Compras(self.new_compra.value,self.precio)
 
+        self.compras.controls.append(task)
+        self.update()
 
+    def update(self):
+        
+        self.task_total.value= f"Total = {self.total}"
 
+        super().update()
 class Registro(UserControl):
       
     
@@ -175,10 +307,10 @@ class Registro(UserControl):
                
             
     def registro_click(self, e):
-        if self.nombre_task.value and self.precio_task.value:
-           respuesta =registro_producto(self.nombre_task.value,float(self.precio_task.value))
-        if respuesta==True:
-            print("incercion exitosa")
+        # if self.nombre_task.value and self.precio_task.value:
+        #    #respuesta =registro_producto(self.nombre_task.value,float(self.precio_task.value))
+        # if respuesta==True:
+        print("incercion exitosa")
                 
                    
                     
@@ -252,8 +384,19 @@ class TodoApp(UserControl):
                     
         
    
+            
         
-        
+    def get_collection(self):
+        try:
+            dbname=dbase
+            if dbname is None:
+                dbname = get_database() 
+            
+            
+            return(dbname["productos"] )
+        except Exception as e:
+            return(False)
+
 
 
             
@@ -262,8 +405,19 @@ class TodoApp(UserControl):
         self.total=0
         self.tasks.controls.clear()
         self.update()
-        if self.new_task.value:
+        
+        try:
+            collection_name = dbase["productos"]
             cliente=collection_name.find({"cliente":self.new_task.value})
+            print(cliente[0]["cliente"])
+            if  cliente[0]["cliente"]==self.new_task.value:
+                print("cliente  existe:")
+            else:
+                print("no existe")
+                collection_name=get_database()
+                cliente=collection_name["productos"]
+                
+
             
             for n in cliente:
                 data=n['lista']
@@ -278,7 +432,11 @@ class TodoApp(UserControl):
                 
                 
                 self.tasks.controls.append(task)
-            
+        except Exception as ex:
+            error="Cliente no existe pruebe nuevamente"
+            task=NoTasK(error)
+            self.tasks.controls.append(task)
+        finally:
             self.update()
 
     def tabs_changed(self, e):
@@ -298,7 +456,7 @@ class TodoApp(UserControl):
 class Con(UserControl):
     def build(self):
 
-        
+      
         
         self.c1 = Container(
             
@@ -327,10 +485,13 @@ class Con(UserControl):
         )
 
         self.c3 = Container(
-            content=OutlinedButton("Outlined Button in Container"),
+            content=Compra(),
             visible=False,
-            bgcolor=colors.WHITE,
-            padding=5,
+             border_radius=20,
+            margin=10,
+            padding=flet.padding.symmetric(horizontal=10,vertical=50),
+            
+            bgcolor=flet.colors.BROWN_50,
         )
 
         return Column(  expand=True,          
@@ -339,11 +500,12 @@ class Con(UserControl):
                     controls=[
                             self.c1,  
                             self.c2, 
+                            self.c3,
                             Row( alignment="spaceAround",
                                 
                                 vertical_alignment="center",
                                 controls=[  
-                                        ElevatedButton(text="Inicio",on_click=self.button_clicked),
+                                        ElevatedButton(text="Inicio",on_click=self.button_clicked3),
                                         ElevatedButton(text="Buscar",on_click=self.button_clicked),
                                         ElevatedButton(text="Agregar",on_click=self.button_clicked2),
                                         ElevatedButton(text="Historial",on_click=self.button_clicked)
@@ -356,14 +518,20 @@ class Con(UserControl):
     def button_clicked2(self,e):
         self.c1.visible=False
         self.c2.visible=True
+        self.c3.visible=False
         self.update()
 
     def button_clicked(self,e):
         self.c1.visible=True
         self.c2.visible=False
+        self.c3.visible=False
         self.update()
     
-    
+    def button_clicked3(self,e):
+        self.c1.visible=False
+        self.c2.visible=False
+        self.c3.visible=True
+        self.update()
   
 def main(page: Page):
     page.horizontal_alignment = "center"
@@ -380,7 +548,7 @@ def main(page: Page):
         # def router_change(route):
     
    
-    
+   
     page.add(app)
 
     
