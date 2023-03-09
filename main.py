@@ -40,32 +40,34 @@ from get_data import  get_database
 dbase=get_database()
 
 class Compras(UserControl):
-    def __init__(self, producto, new_precio:float,task_precio, task_cantidad,task_mostrar):
+    def __init__(self, producto, new_precio,task_precio, task_cantidad,quitar_producto, agregar_producto):
         super().__init__()
         self.task_producto  = producto
         self.task_cantidad=task_cantidad
-        self.task_precio= task_precio
-        self.precio    = new_precio
-        self.cantidad=1
-        self.task_mostrar=task_mostrar
-        #self.agregar_producto(self,self.precio)
+        
+        self.task_precio    = new_precio
+        #task_total=self.task_precio
+        self.quitar_producto=quitar_producto
+        
+        self.agregar_producto=agregar_producto
+        self.agregar_producto(self.task_precio)
         
         
         
     def build(self):
-        #self.total=self.precio
-        self.task_precio(self)
+        self.task_total=self.task_precio
+        #self.task_precio(self)
         self.display_task=TextField(label="producto -",
         label_style=TextStyle(size=20,color="black") ,value=self.task_producto,
         border=flet.InputBorder.UNDERLINE, disabled=True,
          text_size=32,
         text_style=TextStyle(color="black",size=25))
        
-        self.task_cantidad_view=Text(f"{self.cantidad}")
+        self.task_cantidad_view=Text(f"{self.task_cantidad}",size=28,color="black")
         
         
         
-        self.task_precio_view = Text(f"{self.precio}",size=32)
+        self.task_precio_view = Text(f"{self.task_precio}",size=32,color="black")
         
        
         
@@ -86,7 +88,7 @@ class Compras(UserControl):
                         ),
                         IconButton(
                         icon = icons.ATTACH_MONEY,disabled=True
-                        ),self.task_precio ])
+                        ),self.task_precio_view ])
 
 
         self.display_view= Row(expand=True,
@@ -104,30 +106,36 @@ class Compras(UserControl):
 
     def agregar_producto2(self,e):
         
-        
-        self.cantidad=self.cantidad+1
+        self.task_total+=float(self.task_precio)
+        self.task_cantidad=self.task_cantidad+1
+        #self.task_cantidad_view.value=f"{self.cantidad}"
+        self.agregar_producto(self.task_precio_view.value)
         print("agregar2")
         
-        #print(self.task_precio.value)
-        self.task_cantidad(self)
+        print(self.task_total)
+        #self.task_cantidad(self)
         self.update()
 
+    def total_total(self):
+       
 
+        return(self.task_total)
     def quitar_producto2(self, e):
-        
-        
-        self.cantidad=self.cantidad-1
+        #self.total_view-=float(self.task_precio.value)
+        self.quitar_producto(self.task_precio_view.value)
+        self.task_cantidad=self.task_cantidad-1
+        self.task_total-=float(self.task_precio)
         print("quitar2")
         
-        self.task_cantidad(self)
+        #self.task_cantidad(self)
         
         
         self.update()
     
     def update(self):
-        
-           
-        self.task_cantidad_view.value=f"{self.cantidad}"
+        total=self.task_total
+        #Compra.task_mostrar(self,total)
+        self.task_cantidad_view.value=f"{self.task_cantidad}"
         self.display_task.value=f"{self.task_producto}"
        
         #self.task_total_compra.value=f"{self.total_view}"
@@ -158,19 +166,20 @@ class Task(UserControl):
      
 
     def build(self):
-        self.display_task=TextField(label="producto -",
-        label_style=TextStyle(size=20,color="black") ,
-        border=flet.InputBorder.UNDERLINE, disabled=True,
-        expand=True, value=self.task_producto,text_size=32,
-        text_style=TextStyle(color="black",size=25))
 
-        self.precio = Text(self.precio,size=32)
+        self.display_task=TextField(
+            label="producto -",
+            label_style=TextStyle(size=20,color="black") ,
+            border=flet.InputBorder.UNDERLINE, disabled=True,
+            expand=True, value=self.task_producto,text_size=32,
+            text_style=TextStyle(color="black",size=25))
+
+        self.precio = Text(
+            self.precio,size=32)
         self.display_view= Row(
-            
             controls=[
                  self.display_task,
                  Row(
-            
                     spacing=10,
                     controls=[
                         IconButton(
@@ -209,17 +218,18 @@ class Compra(UserControl):
     
 
     def build(self):
-        self.precio=0.0
+        lista_total=0
+        self.task_total=0
         self.new_precio=0.0
         self.task_cantidad=1
-        
+        self.task_precio=0.0
         self.total_view=0
         self.new_compra = TextField(
             hint_text="producto",
             on_submit=self.agregar_click,
-            expand = True)
+            expand = True,text_style=TextStyle(color="black",size=25))
         self.compras = Column()
-        self.task_total_compra=Text(f"{self.total_view}")
+        self.task_total_compra=Text(f"Total={self.total_view}",size=32,color="black")
         
         
         
@@ -239,13 +249,15 @@ class Compra(UserControl):
                     
                         Column(
                             spacing=25,
+                            
                             controls=[
                                 
                                 self.compras,
                                  
                                 ]
 
-                        ),Row(controls=[self.task_total_compra])
+                        ),Row(vertical_alignment=MainAxisAlignment.END,alignment="spaceAround"
+                              ,controls=[self.task_total_compra])
                        
                                 
                         ]
@@ -281,37 +293,50 @@ class Compra(UserControl):
            
            
             
-            task=Compras(self.new_compra.value,self.new_precio,self.task_precio,self.task_cantidad,self.task_mostrar)
+            tasks=Compras(self.new_compra.value,self.new_precio,self.task_precio,self.task_cantidad,self.quitar_producto,self.agregar_producto)
 
-        self.compras.controls.append(task)
-        #total_precio=self.total_view+self.new_precio
+            self.compras.controls.append(tasks)
+            #total_precio=self.total_view+self.new_precio
+            self.update()
+
+    def quitar_producto(self,task_precio):
+        self.task_precio=task_precio
+        self.task_total= self.task_total-(float(self.task_precio))
+        print("agregar")
         self.update()
 
-   
+    def agregar_producto(self,task_precio):
+        self.task_precio=task_precio
+        self.task_total= self.task_total+(float(self.task_precio))
+        print("agregar")
+        self.update()
             
-    def task_mostrar(self,e):
+    def task_mostrar(self,total):
+        self.task_total=total
         self.update()
-    def task_cantidad(self, task):
+    # def task_cantidad(self, task):
               
+        # self.task_cantidad
+        # print("Compra task_cantidad")
+        # print(self.task_cantidad)
         
-        self.update()
 
-    def task_precio(self,task):
+    # def task_precio(self,task):
         
         
-        self.update()
+    #     self.update()
         
        
 
     def update(self):
-        total=0
         
-
         
-        for task in self.compras.controls:
-            total=total+(task.cantidad *task.precio)
+        #self.task_total=Compras.total_total(self)
         
-        self.total_view=total
+        # for task in self.compras.controls:
+        #     total=total+(task.cantidad *task.precio)
+        
+        self.total_view=self.task_total
        
         self.task_total_compra.value=f"{self.total_view}"
         super().update()
