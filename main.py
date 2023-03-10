@@ -40,6 +40,14 @@ from get_data import  get_database
 lista =[]
 dbase=get_database()
 
+class ListaProductos(Stack):
+    def __init__(self,producto,precio):
+        self.producto=producto
+        self.precio=precio
+
+
+
+
 class Compras(UserControl):
     def __init__(self, producto, new_precio,task_precio, task_cantidad,quitar_producto, agregar_producto):
         super().__init__()
@@ -102,11 +110,25 @@ class Compras(UserControl):
                  
             
         )
-        return(Column (expand=True,controls=[Row(controls=[self.display_view,self.display_items]),
-                            ],
-                            ))
-    
 
+        # return Row(expand=True,controls=[self.display_task,
+        #                                 IconButton(
+        #                                         visible =False,
+        #                                         icon = icons.ARROW_LEFT,
+        #                                         on_click=self.quitar_producto2,),
+        #                                 self.task_cantidad_view,
+        #                                 IconButton(
+        #                                         visible = True,
+        #                                         icon=icons.ARROW_RIGHT,
+        #                                         on_click=self.agregar_producto2),
+        #                                 IconButton(
+        #                                         icon = icons.ATTACH_MONEY,disabled=True),
+        #                                 self.task_precio_view
+
+                                        
+        #                                 ])
+        return Row(expand=True,controls=[self.display_view,self.display_items])
+    
     def agregar_producto2(self,e):
         
         self.task_total+=float(self.task_precio)
@@ -141,7 +163,7 @@ class Compras(UserControl):
         self.update()
     
     def update(self):
-        total=self.task_total
+        
         #Compra.task_mostrar(self,total)
         self.task_cantidad_view.value=f"{self.task_cantidad}"
         self.display_task.value=f"{self.task_producto}"
@@ -250,7 +272,7 @@ class Compra(UserControl):
         
         
         
-        return Container(bgcolor="blue",content=( Column(
+        return Container(content=( Column(
             expand=True,
                    
                     controls=[
@@ -264,21 +286,18 @@ class Compra(UserControl):
 
                         ),
                     
-                        Column(
-                            spacing=30,
-                            
-                            controls=[
+                        
                                 
                                 Container(padding=flet.padding.symmetric(horizontal=40),
-                                                  bgcolor="white",
+                                                  
                                                   content=(self.compras))
                                  
-                                ]
+                                
 
-                        ),Row(vertical_alignment=CrossAxisAlignment.END
+                        ,Row(vertical_alignment=CrossAxisAlignment.END
                               ,
                               controls=[Container(expand=True,padding=flet.padding.symmetric(horizontal=40),
-                                                  bgcolor="brown",
+                                                  
                                                   content=(self.task_total_compra))])
                        
                                 
@@ -309,7 +328,7 @@ class Compra(UserControl):
   
 
     def agregar_click(self, e):
-        
+        count=0
         if self.new_compra.value:
             
             self.new_precio=self.get_precios(self.new_compra.value)
@@ -327,6 +346,12 @@ class Compra(UserControl):
             self.new_compra.value=""
             self.new_compra.focus()
             
+
+
+           
+
+
+
             self.update()
 
         
@@ -367,8 +392,6 @@ class Compra(UserControl):
         
         #self.task_total=Compras.total_total(self)
         
-        # for task in self.compras.controls:
-        #     total=total+(task.cantidad *task.precio)
         
         self.total_view=self.task_total
         
@@ -383,15 +406,15 @@ class Registro(UserControl):
     def build(self):
         self.total=0
         
-        self.nombre_task= TextField(hint_text="Nomre del producto",hint_style=TextStyle(color="black"),label_style=TextStyle(color="black"),color="black",expand=True)
-        self.precio_task= TextField(hint_text="Precio del producto",hint_style=TextStyle(color="black"),color="black", expand=True)
-        self.buton_task= ElevatedButton(text="Registrar",on_click=self.registro_click)
+        self.nombre_task= TextField(label="Nomre del producto",label_style=TextStyle(size=20,color="black") ,color="black",text_size=32,expand=True)
+        self.precio_task= TextField(label="Precio del producto",label_style=TextStyle(size=20,color="black") ,color="black",text_size=32, expand=True)
+        self.buton_task= ElevatedButton(width=200,height=70,content=Text(value="Registrar",size=30),on_click=self.registro_click)
         self.tasks = Column()
         
         
         
-        return Row(
-            expand=True,
+        return Column(expand=True,controls=[Row(
+           
                             vertical_alignment=MainAxisAlignment.SPACE_BETWEEN,
                     controls=[
 
@@ -407,8 +430,8 @@ class Registro(UserControl):
                                         controls=[self.precio_task,]
                                     ),                       
                                 ]
-                        ) ,VerticalDivider(),
-                            Column(
+                        ) ,VerticalDivider(color="white",width=200,visible=True),
+                            Column(width=200,
                                 controls=[
                                     
                                    
@@ -421,7 +444,39 @@ class Registro(UserControl):
                       
                     ]
                     
-        )
+        ),
+        Row(
+            
+                            vertical_alignment=MainAxisAlignment.SPACE_BETWEEN,
+                    controls=[
+
+                            Column(expand=True,
+                                
+                                spacing=20,
+                                horizontal_alignment="center",
+                                controls=[
+                                    Row(
+                                                              
+                                        ),
+                                    Row(
+                                        
+                                    ),                       
+                                ]
+                        ) ,VerticalDivider(),
+                            Column(width=200,height=200,
+                                controls=[
+                                    
+                                   
+                                        Row()
+                                        
+                                    
+                                ]
+                            ),
+                        
+                      
+                    ]
+                    
+        )])
                
             
     def registro_click(self, e):
@@ -602,7 +657,7 @@ class Con(UserControl):
              border_radius=20,
             margin=10,
             padding=flet.padding.symmetric(horizontal=10,vertical=50),
-            
+            alignment= flet.alignment.center,
             bgcolor=flet.colors.LIGHT_BLUE_100,
             
         )
@@ -613,7 +668,7 @@ class Con(UserControl):
              border_radius=20,
             margin=10,
             padding=flet.padding.symmetric(horizontal=10,vertical=50),
-            
+            alignment= flet.alignment.center,
             bgcolor=flet.colors.BROWN_500,
         )
 
@@ -628,10 +683,10 @@ class Con(UserControl):
                                 
                                 vertical_alignment="center",
                                 controls=[  
-                                        ElevatedButton(text="Inicio",on_click=self.button_clicked3),
-                                        ElevatedButton(text="Buscar",on_click=self.button_clicked),
-                                        ElevatedButton(text="Agregar",on_click=self.button_clicked2),
-                                        ElevatedButton(text="Historial",on_click=self.button_clicked)
+                                        ElevatedButton(width=160,height=70,content=Text(value="Inicio",size=30),on_click=self.button_clicked3),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Buscar",size=30),on_click=self.button_clicked),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Agregar",size=30),on_click=self.button_clicked2),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Historial",size=30),on_click=self.button_clicked)
                                 ]
                             ),
                         ]
@@ -665,7 +720,7 @@ def main(page: Page):
     page.window_min_height=600
     page.window_min_width=800    
     
-    page.window_bgcolor=flet.colors.BLUE_GREY_400
+    #page.window_bgcolor=flet.colors.BLUE_GREY_400
     page.update()
    
     # create application instance
