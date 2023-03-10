@@ -8,7 +8,8 @@ from flet import (
     OutlinedButton,
     Page,
     Ref,
-    row,
+    Stack,
+    TextAlign,
     Container,
     Card,
     InputBorder,
@@ -36,7 +37,7 @@ from flet import (
 
 from get_data import  get_database
 
-
+lista =[]
 dbase=get_database()
 
 class Compras(UserControl):
@@ -51,7 +52,7 @@ class Compras(UserControl):
         
         self.agregar_producto=agregar_producto
         self.agregar_producto(self.task_precio)
-        
+       
         
         
     def build(self):
@@ -69,12 +70,13 @@ class Compras(UserControl):
         
         self.task_precio_view = Text(f"{self.task_precio}",size=32,color="black")
         
-       
+        
         
 
         self.display_items=Row(controls=[ IconButton(
-                        visible =True,
+                        visible =False,
                         icon = icons.ARROW_LEFT,
+                        tooltip="arrow-quitar",
                         
                         on_click=self.quitar_producto2,
                         ),
@@ -82,6 +84,7 @@ class Compras(UserControl):
                         IconButton(
                         visible = True,
                         icon=icons.ARROW_RIGHT,
+                        
                         on_click=self.agregar_producto2 
                         
                         
@@ -111,7 +114,7 @@ class Compras(UserControl):
         #self.task_cantidad_view.value=f"{self.cantidad}"
         self.agregar_producto(self.task_precio_view.value)
         print("agregar2")
-        
+        self.display_items.controls[IconButton.tooltip=="arro-quitar"].visible=True
         print(self.task_total)
         #self.task_cantidad(self)
         self.update()
@@ -121,14 +124,19 @@ class Compras(UserControl):
 
         return(self.task_total)
     def quitar_producto2(self, e):
-        #self.total_view-=float(self.task_precio.value)
-        self.quitar_producto(self.task_precio_view.value)
-        self.task_cantidad=self.task_cantidad-1
-        self.task_total-=float(self.task_precio)
-        print("quitar2")
-        
+        if self.task_cantidad>2:
+            self.display_items.controls[IconButton.tooltip=="arro-quitar"].visible=True
+            self.quitar_producto(self.task_precio_view.value)
+            self.task_cantidad=self.task_cantidad-1
+            self.task_total-=float(self.task_precio)
+            print("quitar2")
+            
         #self.task_cantidad(self)
-        
+        elif self.task_cantidad==2:
+            self.display_items.controls[IconButton.tooltip=="arro-quitar"].visible=False
+            self.quitar_producto(self.task_precio_view.value)
+            self.task_cantidad=self.task_cantidad-1
+            self.task_total-=float(self.task_precio)
         
         self.update()
     
@@ -137,7 +145,7 @@ class Compras(UserControl):
         #Compra.task_mostrar(self,total)
         self.task_cantidad_view.value=f"{self.task_cantidad}"
         self.display_task.value=f"{self.task_producto}"
-       
+        
         #self.task_total_compra.value=f"{self.total_view}"
         super().update()
     
@@ -171,7 +179,9 @@ class Task(UserControl):
             label="producto -",
             label_style=TextStyle(size=20,color="black") ,
             border=flet.InputBorder.UNDERLINE, disabled=True,
-            expand=True, value=self.task_producto,text_size=32,
+            expand=True, 
+            tooltip="sopa",
+            value=self.task_producto,text_size=32,
             text_style=TextStyle(color="black",size=25))
 
         self.precio = Text(
@@ -227,17 +237,24 @@ class Compra(UserControl):
         self.new_compra = TextField(
             hint_text="producto",
             on_submit=self.agregar_click,
+            tooltip="sopa",
             expand = True,text_style=TextStyle(color="black",size=25))
         self.compras = Column()
-        self.task_total_compra=Text(f"Total={self.total_view}",size=32,color="black")
+        self.compras2= Stack()
+        self.task_total_compra=TextField(value=f"Total={self.total_view}",
+                                         text_style=TextStyle(size=32,color="black",),
+                                         border=flet.InputBorder.UNDERLINE, disabled=True,
+                                         
+                                         
+                                         text_align=TextAlign.END)
         
         
         
-        return Column(
+        return Container(bgcolor="blue",content=( Column(
             expand=True,
                    
                     controls=[
-                
+                        
                         Row(
                             controls=[
                             self.new_compra,
@@ -248,22 +265,27 @@ class Compra(UserControl):
                         ),
                     
                         Column(
-                            spacing=25,
+                            spacing=30,
                             
                             controls=[
                                 
-                                self.compras,
+                                Container(padding=flet.padding.symmetric(horizontal=40),
+                                                  bgcolor="white",
+                                                  content=(self.compras))
                                  
                                 ]
 
-                        ),Row(vertical_alignment=MainAxisAlignment.END,alignment="spaceAround"
-                              ,controls=[self.task_total_compra])
+                        ),Row(vertical_alignment=CrossAxisAlignment.END
+                              ,
+                              controls=[Container(expand=True,padding=flet.padding.symmetric(horizontal=40),
+                                                  bgcolor="brown",
+                                                  content=(self.task_total_compra))])
                        
                                 
                         ]
 
             
-                )
+                )))
 
     
     
@@ -274,7 +296,7 @@ class Compra(UserControl):
         dic=test.find({"nombre":producto})
         for b in dic:
             if b["nombre"]== producto:
-                print("encontrado")
+                print("encontrado, precio")
                 prec=b["precio"]
 
         #self.total_view+=float(prec)
@@ -287,18 +309,30 @@ class Compra(UserControl):
   
 
     def agregar_click(self, e):
-    
+        
         if self.new_compra.value:
+            
             self.new_precio=self.get_precios(self.new_compra.value)
            
            
             
             tasks=Compras(self.new_compra.value,self.new_precio,self.task_precio,self.task_cantidad,self.quitar_producto,self.agregar_producto)
-
+            
+           
+              
             self.compras.controls.append(tasks)
+            lista.append(self.new_compra.value)
+          
             #total_precio=self.total_view+self.new_precio
+            self.new_compra.value=""
+            self.new_compra.focus()
+            
             self.update()
 
+        
+           
+               
+           
     def quitar_producto(self,task_precio):
         self.task_precio=task_precio
         self.task_total= self.task_total-(float(self.task_precio))
@@ -337,8 +371,9 @@ class Compra(UserControl):
         #     total=total+(task.cantidad *task.precio)
         
         self.total_view=self.task_total
+        
        
-        self.task_total_compra.value=f"{self.total_view}"
+        self.task_total_compra.value=f"Total = {self.total_view}"
         super().update()
 
 class Registro(UserControl):
