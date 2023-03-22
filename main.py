@@ -1,10 +1,11 @@
 import flet 
 from datetime import datetime
 import time , threading
-
+from vista import VistaProducto
 from flet import (
     Checkbox,
     Column,
+    ButtonStyle,
     FloatingActionButton,
     IconButton,
     OutlinedButton,
@@ -50,15 +51,15 @@ class ListaProductos(Stack):
 
 
 class Clock(Text):
-    def __init__(self, clock_var):
+    def __init__(self):
         super().__init__()
-        self.clock_var= clock_var
+        
         self.size=24
         self.color="black"
         self.visible=True
-        self.value=self.clock_var
-    def build(self):
-        self.clock_time_view=self
+        
+        self.value=None
+
 
     def did_mount(self):
         self.running=True
@@ -73,14 +74,40 @@ class Clock(Text):
         while self.running:
             clock_var=datetime.now()
             
-            self.clock_time_view.value= clock_var.strftime("%Y-%m-%d %H:%M:%S" )
-            print(self.clock_time_view.value)
+            self.value= clock_var.strftime("%Y-%m-%d %H:%M:%S" )
+            
             self.update()
             time.sleep(1)
+    
+class MostrarView(Stack):
+    def __init__(self, mostrar):
+        super().__init__()
+        self.controls = []
+        self.mostrar=mostrar
+        
 
- 
+    def crear_stack(self):
+        self.stack=[]
+        self.stack=VistaProducto()
+        
+class VistaProducto(Container):
+    def __init__(self, mostrar ):
+        super().__init__()
+        self.pile=[]
+        self.mostrar=mostrar
+        self.width=50
+        self.height=110
+        self.border=10
+        self.border_radius = self.border_radius.all(6)
+        self.bgcolor="green"
+  
+   
+      
+
+
+
 class Compras(UserControl):
-    def __init__(self, producto, new_precio,task_precio, task_cantidad,quitar_producto, agregar_producto):
+    def __init__(self, producto, new_precio, task_cantidad,quitar_producto, agregar_producto):
         super().__init__()
         self.task_producto  = producto
         self.task_cantidad=task_cantidad
@@ -92,7 +119,7 @@ class Compras(UserControl):
         self.agregar_producto=agregar_producto
         self.agregar_producto(self.task_precio)
 
-        self.clock_var= datetime.now()
+        
        
    
 
@@ -104,10 +131,8 @@ class Compras(UserControl):
         border=flet.InputBorder.UNDERLINE, disabled=True,
          text_size=32,
         text_style=TextStyle(color="black",size=25))
-       
+        
         self.task_cantidad_view=Text(f"{self.task_cantidad}",size=28,color="black")
-        
-        
         
         self.task_precio_view = Text(f"{self.task_precio}",size=32,color="black")
         
@@ -183,7 +208,7 @@ class Compras(UserControl):
             self.display_items.controls[IconButton.tooltip=="arro-quitar"].visible=True
             self.quitar_producto(self.task_precio_view.value)
             self.task_cantidad=self.task_cantidad-1
-            self.task_total-=float(self.task_precio)
+            #self.task_total-=float(self.task_precio)
             print("quitar2")
             
         #self.task_cantidad(self)
@@ -191,7 +216,7 @@ class Compras(UserControl):
             self.display_items.controls[IconButton.tooltip=="arro-quitar"].visible=False
             self.quitar_producto(self.task_precio_view.value)
             self.task_cantidad=self.task_cantidad-1
-            self.task_total-=float(self.task_precio)
+            #self.task_total-=float(self.task_precio)
         
         self.update()
     
@@ -304,7 +329,7 @@ class Compra(UserControl):
                                          
                                          text_align=TextAlign.END)
         
-        self.clock_time_view=Clock(clock_var=self)
+        self.clock_time_view=Clock()
         
         return Container(content=( Column(
             expand=True,
@@ -341,23 +366,7 @@ class Compra(UserControl):
             
                 )))
 
-    def did_mount(self):
-        self.running=True
-        self.th=threading.Thread(target=self.update_timer, args=(),daemon=True)
-        self.th.start() 
-
-    def will_unmount(self):
-        self.running=True
-    
-    
-    def update_timer(self):
-        while self.running:
-            clock_var=datetime.now()
-            
-            self.clock_time_view.value= clock_var.strftime("%Y-%m-%d %H:%M:%S" )
-            print(self.clock_time_view.value)
-            self.update()
-            time.sleep(1)
+   
     
     def get_precios(self,producto):
         
@@ -386,7 +395,7 @@ class Compra(UserControl):
            
            
             
-            tasks=Compras(self.new_compra.value,self.new_precio,self.task_precio,self.task_cantidad,self.quitar_producto,self.agregar_producto)
+            tasks=Compras(self.new_compra.value,self.new_precio,self.task_cantidad,self.quitar_producto,self.agregar_producto)
             
            
               
@@ -456,35 +465,49 @@ class Registro(UserControl):
 
     def build(self):
         self.total=0
-        clock_var=Clock(self)
-        self.clock_val=clock_var
+        
+        self.titulo=TextField(value="Registro",text_size=38, expand=True, border=flet.InputBorder.UNDERLINE,)
         self.nombre_task= TextField(label="Nomre del producto",label_style=TextStyle(size=20,color="black") ,color="black",text_size=32,expand=True)
         self.precio_task= TextField(label="Precio del producto",label_style=TextStyle(size=20,color="black") ,color="black",text_size=32, expand=True)
         self.buton_task= ElevatedButton(width=200,height=70,content=Text(value="Registrar",size=30),on_click=self.registro_click)
         self.tasks = Column()
-        self.clock_time_view=Clock(clock_var=self)
+        self.clock_time_view=Clock()
+        self.filter=Tabs(
+            width=600,
+            selected_index=0,
+            on_change=self.tabs_changed,
+            tabs=[Tab( tab_content=Text("producto",color="black")),
+                  Tab( tab_content=Text("clientes",color="black")),
+                  Tab( tab_content=Text("proveedores",color="black")),
+                  ],
+            )
         
-        
-        return Column(expand=True,controls=[Container(content=(self.clock_time_view)),
-                    Row(vertical_alignment=MainAxisAlignment.SPACE_BETWEEN,
+        return Column(expand=True,controls=[
+            
+                    Container(width=200,content=(self.clock_time_view)),
+                    Row(
                         controls=[
-                            Column(expand=True,
-                                    spacing=20,
-                                    horizontal_alignment="center",
-                                    controls=[
-                                        Row(controls=[self.nombre_task,]),Row(controls=[self.precio_task,]),]
+                    Column(controls=[
+                                Row(controls=[self.nombre_task,]),Row(controls=[self.precio_task,])],
+                                expand=True,
+                                spacing=20,
+                                horizontal_alignment="center",
+                           
                                 ),
-                            VerticalDivider(color="white",width=200,visible=True),
-                            Column(width=200,controls=[
-                                Row(controls=[self.buton_task])]),]),Row(controls=[
-                                                                        Column(controls=[Row(),Row(),]),VerticalDivider(),
-                                                                        Column(width=200,height=200,controls=[Row()]),],
-                                                                        vertical_alignment=MainAxisAlignment.SPACE_BETWEEN,
-                                                                        )
+                    VerticalDivider(color="white",width=200,visible=True),
+                    Column(width=200,controls=[
+                                         Row(controls=[self.buton_task])]),],
+                                                vertical_alignment=MainAxisAlignment.SPACE_BETWEEN,
+                            ),
+                  
                                 ]
                     )
                
-  
+    
+    def tabs_changed(self, e):
+      
+        self.update()
+
 
     def registro_click(self, e):
         # if self.nombre_task.value and self.precio_task.value:
@@ -504,48 +527,55 @@ class TodoApp(UserControl):
 
     def build(self):
         self.total=0
+        self.titulo=TextField(value="Busqueda",text_size=38, expand=True,  border=flet.InputBorder.NONE,color="black",
+                              text_align=TextAlign.CENTER)
         self.new_task = TextField(
             hint_text="busqueda",hint_style=TextStyle(color="black"),
             on_submit=self.button_clicked,
             color="black",
             expand = True)
-        self.tasks = Column()
+        self.tasks = Column(width=800)
         self.task_total_lista=Text(size=32,color="black")
         self.filter=Tabs(
+            expand=True,
+             
             selected_index=0,
             on_change=self.tabs_changed,
-            tabs=[Tab( tab_content=Text("lista de compras",color="black")),
-                  Tab( tab_content=Text("lista de compras",color="black")),
-                  Tab( tab_content=Text("lista de compras",color="black")),
-                  Tab( tab_content=Text("lista de compras",color="black"))],
+            tabs=[Tab( tab_content=Text("producto",color="black")),
+                  Tab( tab_content=Text("clientes",color="black")),
+                  Tab( tab_content=Text("proveedores",color="black")),
+                  ],
             )
-        self.clock_time_view=Clock(clock_var=self)
+        self.clock_time_view=Clock()
         
         return Column(
             expand=True,
                    
-                    controls=[
+                    controls=[ Container(bgcolor="white",content=(self.titulo)),
+                        Container(width=200,content=(self.clock_time_view)),
                 
-                        Row(
+                        Row(spacing=50,
                             controls=[
                             self.new_task,
-                            ElevatedButton(text="Submit", on_click=self.button_clicked),
+                            ElevatedButton(content=(Text(value="Sumit",size=26)),on_click=self.button_clicked,width=150,height=70),
                            
                             ],
 
                         ),
                     
-                        Column(
-                                alignment="center",
+                       Container(bgcolor="green",content=( Column(
+                              
+                              expand=True,alignment=MainAxisAlignment.SPACE_BETWEEN,
+                            horizontal_alignment=CrossAxisAlignment.CENTER,
                             spacing=25,
                             controls=[
-                                self.filter,
-                                self.tasks,
+                                Container(bgcolor="red", margin=20,content=(self.filter)),
+                                Container(bgcolor="blue", content=(self.tasks))
                                  
                                 ]
 
-                        ),Row(
-                            
+                        ))),Row(
+                            visible=False,
                             vertical_alignment="center",
                             alignment=MainAxisAlignment.END ,
                             
@@ -564,29 +594,7 @@ class TodoApp(UserControl):
             
                 )
                 
-                
-                   
-                    
-        
-                 
-    def did_mount(self):
-        self.running=True
-        self.th=threading.Thread(target=self.update_timer, args=(),daemon=True)
-        self.th.start() 
-
-    def will_unmount(self):
-        self.running=True
-    
-    
-    def update_timer(self):
-        while self.running:
-            clock_var=datetime.now()
-            
-            self.clock_time_view.value= clock_var.strftime("%Y-%m-%d %H:%M:%S" )
-            print(self.clock_time_view.value)
-            self.update()
-            time.sleep(1)
-            
+   
         
     def get_collection(self):
         try:
@@ -599,9 +607,6 @@ class TodoApp(UserControl):
         except Exception as e:
             return(False)
 
-
-
-            
     def button_clicked(self, e):
         dic_sec =[]
         self.total=0
@@ -613,6 +618,20 @@ class TodoApp(UserControl):
             cliente=collection_name.find({"cliente":self.new_task.value})
             print(cliente[0]["cliente"])
             if  cliente[0]["cliente"]==self.new_task.value:
+                
+                for n in cliente:
+                    data=n['listas']
+                    
+                for n in data:
+                    fecha=n["fecha"]
+                    data2=n["producto"]
+                    m=n["total"]
+                   
+                    print(fecha)
+                for bm in data2:
+              
+                    print(bm)
+                print(m)
                 print("cliente  existe:")
             else:
                 print("no existe")
@@ -622,18 +641,20 @@ class TodoApp(UserControl):
 
             
             for n in cliente:
-                data=n['lista']
-
-            print(data)
-            for n in data:
-                dic_sec.append(n['producto'])
-
-            for i in range(len(data)):
-                self.total=self.total + float(dic_sec[i]["precio"])*int(dic_sec[i]["cant"])
-                task=Task(dic_sec[i]["nombre"],dic_sec[i]["cant"],dic_sec[i]["precio"])
+                data=n['listas']
+                data2=n["producto"]
+      
+            # for n in data:
+            #     cno=n
+            #     for m in cno:
+            #         dic_sec.append(m)
+            #         print(m)
+            # for i in range(len(data)):
+            #     self.total=self.total + float(dic_sec[i]["precio"])*int(dic_sec[i]["cant"])
+            #     task=Task(dic_sec[i]["nombre"],dic_sec[i]["cant"],dic_sec[i]["precio"])
                 
                 
-                self.tasks.controls.append(task)
+                # self.tasks.controls.append(task)
         except Exception as ex:
             error="Cliente no existe pruebe nuevamente"
             task=NoTasK(error)
@@ -648,13 +669,38 @@ class TodoApp(UserControl):
             self.tasks.visible=True
         self.update()
 
-    
     def update(self):
        
        #self.task_total.value= f"Total = {self.total}"
         super().update()
 
+class Mostrar(UserControl):
+     def build(self):
+       
+        self.new_mostrar = TextField(hint_text="Mostrar",expand = True,text_style=TextStyle(color="black",size=25))
 
+        self.mostrar = Column()
+        
+        
+        
+        self.clock_time_view=Clock()
+        
+        return  Column(
+            expand=True,
+                   
+                    controls=[
+                        Row( controls=[Container(width=200,bgcolor="white",
+                            content=(self.clock_time_view))]),
+                        Row( controls=[Container(width=200,bgcolor="white",
+                            content=( self.new_mostrar))]),
+                        Column( 
+                               
+                               controls=[Container(width=200,bgcolor="white",
+                            content=(self.mostrar))]),
+                                  
+                                  ],
+                    )
+     
 class Con(UserControl):
     def build(self):
 
@@ -667,8 +713,8 @@ class Con(UserControl):
             content= TodoApp(),
             
             border_radius=20,
-            margin=10,
-            padding=flet.padding.symmetric(horizontal=10,vertical=50),
+            margin=3,
+            padding=flet.padding.symmetric(horizontal=15,vertical=1),
             alignment= flet.alignment.center,
             bgcolor=flet.colors.BLUE_ACCENT_100
             
@@ -691,10 +737,21 @@ class Con(UserControl):
             visible=False,
              border_radius=20,
             margin=10,
-            padding=flet.padding.symmetric(horizontal=10,vertical=50),
+            padding=flet.padding.symmetric(horizontal=10,vertical=10),
             alignment= flet.alignment.center,
             bgcolor=flet.colors.BROWN_500,
         )
+
+        self.c4 = Container(
+            content=Mostrar(),
+            visible=False,
+             border_radius=20,
+            margin=10,
+            padding=flet.padding.symmetric(horizontal=10,vertical=50),
+            alignment= flet.alignment.center,
+            bgcolor=flet.colors.GREEN_100,
+        )
+        
 
         return Column(  expand=True,          
                 
@@ -703,14 +760,15 @@ class Con(UserControl):
                             self.c1,  
                             self.c2, 
                             self.c3,
+                            self.c4,
                             Row( alignment="spaceAround",
                                 
                                 vertical_alignment="center",
                                 controls=[  
-                                        ElevatedButton(width=160,height=70,content=Text(value="Inicio",size=30),on_click=self.button_clicked3),
-                                        ElevatedButton(width=160,height=70,content=Text(value="Buscar",size=30),on_click=self.button_clicked),
-                                        ElevatedButton(width=160,height=70,content=Text(value="Agregar",size=30),on_click=self.button_clicked2),
-                                        ElevatedButton(width=160,height=70,content=Text(value="Historial",size=30),on_click=self.button_clicked)
+                                        ElevatedButton(width=160,height=70,content=Text(value="Inicio",size=26),on_click=self.button_clicked3),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Buscar",size=26),on_click=self.button_clicked),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Agregar",size=26),on_click=self.button_clicked2),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Historial",size=26),on_click=self.button_clicked4)
                                 ]
                             ),
                         ]
@@ -721,19 +779,30 @@ class Con(UserControl):
         self.c1.visible=False
         self.c2.visible=True
         self.c3.visible=False
+        self.c4.visible=False
         self.update()
 
     def button_clicked(self,e):
         self.c1.visible=True
         self.c2.visible=False
         self.c3.visible=False
+        self.c4.visible=False
         self.update()
     
     def button_clicked3(self,e):
         self.c1.visible=False
         self.c2.visible=False
         self.c3.visible=True
+        self.c4.visible=False
         self.update()
+
+    def button_clicked4(self,e):
+        self.c1.visible=False
+        self.c2.visible=False
+        self.c3.visible=False
+        self.c4.visible=True
+        self.update()
+  
   
 def main(page: Page):
     page.expand=True
