@@ -519,7 +519,7 @@ class Registro(UserControl):
                     
         
 
-class TodoApp(UserControl):
+class Busqueda(UserControl):
     
    
     
@@ -674,7 +674,7 @@ class TodoApp(UserControl):
        #self.task_total.value= f"Total = {self.total}"
         super().update()
 
-class Mostrar(UserControl):
+class Historial(UserControl):
      def build(self):
        
         self.new_mostrar = TextField(hint_text="Mostrar",expand = True,text_style=TextStyle(color="black",size=25))
@@ -701,16 +701,16 @@ class Mostrar(UserControl):
                                   ],
                     )
      
-class Con(UserControl):
+class App(UserControl):
     def build(self):
 
       
         
-        self.c1 = Container(
+        self.busqueda = Container(
             
 
             
-            content= TodoApp(),
+            content= Busqueda(),
             
             border_radius=20,
             margin=3,
@@ -721,7 +721,7 @@ class Con(UserControl):
            
         )
 
-        self.c2 =Container(
+        self.registro =Container(
             content=Registro(),
             visible=False,
              border_radius=20,
@@ -732,7 +732,7 @@ class Con(UserControl):
             
         )
 
-        self.c3 = Container(
+        self.compra = Container(
             content=Compra(),
             visible=False,
              border_radius=20,
@@ -742,8 +742,8 @@ class Con(UserControl):
             bgcolor=flet.colors.BROWN_500,
         )
 
-        self.c4 = Container(
-            content=Mostrar(),
+        self.historial = Container(
+            content=Historial(),
             visible=False,
              border_radius=20,
             margin=10,
@@ -757,50 +757,51 @@ class Con(UserControl):
                 
                     alignment=MainAxisAlignment.SPACE_AROUND,
                     controls=[
-                            self.c1,  
-                            self.c2, 
-                            self.c3,
-                            self.c4,
+                            self.busqueda,  
+                            self.registro, 
+                            self.compra,
+                            self.historial,
                             Row( alignment="spaceAround",
                                 
                                 vertical_alignment="center",
                                 controls=[  
-                                        ElevatedButton(width=160,height=70,content=Text(value="Inicio",size=26),on_click=self.button_clicked3),
-                                        ElevatedButton(width=160,height=70,content=Text(value="Buscar",size=26),on_click=self.button_clicked),
-                                        ElevatedButton(width=160,height=70,content=Text(value="Agregar",size=26),on_click=self.button_clicked2),
-                                        ElevatedButton(width=160,height=70,content=Text(value="Historial",size=26),on_click=self.button_clicked4)
+                                        ElevatedButton(width=160,height=70,content=Text(value="Venta",size=26),on_click=self.button_venta),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Buscar",size=26),on_click=self.button_buscar),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Agregar",size=26),on_click=self.button_registrar),
+                                        ElevatedButton(width=160,height=70,content=Text(value="Historial",size=26),on_click=self.button_historial)
                                 ]
                             ),
                         ]
                     )
 
 
-    def button_clicked2(self,e):
-        self.c1.visible=False
-        self.c2.visible=True
-        self.c3.visible=False
-        self.c4.visible=False
+    def button_registrar(self,e):
+        self.compra.visible = False 
+        self.historial.visible = False
+        self.busqueda.visible = False
+        self.registro.visible=True
         self.update()
 
-    def button_clicked(self,e):
-        self.c1.visible=True
-        self.c2.visible=False
-        self.c3.visible=False
-        self.c4.visible=False
+    def button_buscar(self,e):
+        self.busqueda.visible=True
+        self.historial.visible = False
+        self.registro.visible = False 
+        self.compra.visible = False
         self.update()
     
-    def button_clicked3(self,e):
-        self.c1.visible=False
-        self.c2.visible=False
-        self.c3.visible=True
-        self.c4.visible=False
+    def button_venta(self,e):
+        self.historial.visible= False
+        self.busqueda.visible= False
+        self.registro.visible=False
+        self.compra.visible=True
         self.update()
 
-    def button_clicked4(self,e):
-        self.c1.visible=False
-        self.c2.visible=False
-        self.c3.visible=False
-        self.c4.visible=True
+    def button_historial(self,e):
+        self.compra.visible = False
+        self.registro.visible = False
+        self.busqueda.visible = False
+        
+        self.historial.visible=True
         self.update()
   
   
@@ -817,7 +818,7 @@ def main(page: Page):
     page.update()
    
     # create application instance
-    app=Con()
+    app=App()
    # app2= Otra()
         # def router_change(route):
     
